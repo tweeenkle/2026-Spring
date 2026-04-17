@@ -1,213 +1,147 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>Interactive 심리 상담 채팅</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>스마트 코디 추천</title>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #eef2ff, #f8fafc);
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-
-    header {
-      background-color: #7c9cff;
-      color: white;
-      padding: 16px;
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-    }
-
-    #chat-container {
-      flex: 1;
-      padding: 15px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .message {
-      max-width: 75%;
-      padding: 12px 16px;
-      border-radius: 18px;
-      line-height: 1.5;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .user {
-      align-self: flex-end;
-      background-color: #7c9cff;
-      color: white;
-    }
-
-    .bot {
-      align-self: flex-start;
-      background-color: #e5e7eb;
-    }
-
-    .typing {
-      font-style: italic;
-      opacity: 0.7;
-    }
-
-    #input-area {
-      display: flex;
-      padding: 10px;
-      background-color: white;
-      border-top: 1px solid #ddd;
-    }
-
-    #input {
-      flex: 1;
-      padding: 12px;
-      border-radius: 20px;
-      border: 1px solid #ccc;
-      outline: none;
-    }
-
-    button {
-      margin-left: 10px;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 20px;
-      background-color: #7c9cff;
-      color: white;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      background-color: #6a86e0;
-    }
-
-    #quick-buttons {
-      padding: 10px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      background: #f1f5f9;
-      border-top: 1px solid #ddd;
-    }
-
-    .quick-btn {
-      padding: 8px 12px;
-      border-radius: 15px;
-      border: none;
-      background: #e0e7ff;
-      cursor: pointer;
-      font-size: 13px;
-    }
-
-    .quick-btn:hover {
-      background: #c7d2fe;
-    }
+    body { margin:0; font-family: sans-serif; background:#f4f6fb; }
+    header { background:#5b7cff; color:white; text-align:center; padding:15px; font-weight:bold; }
+    main { display:grid; grid-template-columns:1fr 1fr; gap:15px; padding:15px; }
+    .card { background:white; padding:15px; border-radius:12px; }
+    select,input,button { width:100%; margin-top:8px; padding:10px; border-radius:8px; border:1px solid #ddd; }
+    button { background:#5b7cff; color:white; border:none; cursor:pointer; }
+    .outfit { margin-top:10px; padding:10px; border:1px solid #eee; border-radius:10px; }
+    @media(max-width:800px){ main{grid-template-columns:1fr;} }
   </style>
 </head>
 <body>
+<header>🌤️ 날씨 기반 코디 추천</header>
+<main>
 
-<header>💬 인터랙티브 심리 상담</header>
+<div class="card">
+  <h3>옷 추가</h3>
+  <select id="category">
+    <option value="top">상의</option>
+    <option value="bottom">하의</option>
+    <option value="outer">아우터</option>
+    <option value="shoes">신발</option>
+  </select>
 
-<div id="chat-container"></div>
+  <select id="season">
+    <option>봄</option>
+    <option>여름</option>
+    <option>가을</option>
+    <option>겨울</option>
+  </select>
 
-<div id="quick-buttons">
-  <button class="quick-btn" onclick="quickMessage('요즘 너무 힘들어요')">힘들어요</button>
-  <button class="quick-btn" onclick="quickMessage('불안해요')">불안해요</button>
-  <button class="quick-btn" onclick="quickMessage('외로워요')">외로워요</button>
-  <button class="quick-btn" onclick="quickMessage('괜찮아지고 싶어요')">괜찮아지고 싶어요</button>
+  <select id="thickness">
+    <option value="light">얇음</option>
+    <option value="normal">보통</option>
+    <option value="thick">두꺼움</option>
+  </select>
+
+  <input id="name" placeholder="예: 후드티" />
+  <button onclick="addItem()">추가</button>
+
+  <div id="closet"></div>
 </div>
 
-<div id="input-area">
-  <input type="text" id="input" placeholder="편하게 이야기해 주세요...">
-  <button onclick="sendMessage()">전송</button>
+<div class="card">
+  <h3>코디 조건</h3>
+
+  <select id="weather">
+    <option value="hot">더움 (25도+)</option>
+    <option value="mild">선선 (15~25도)</option>
+    <option value="cold">추움 (15도 이하)</option>
+  </select>
+
+  <select id="seasonSelect">
+    <option>봄</option>
+    <option>여름</option>
+    <option>가을</option>
+    <option>겨울</option>
+  </select>
+
+  <button onclick="recommend()">코디 추천</button>
+
+  <div id="result"></div>
 </div>
+
+</main>
 
 <script>
-  const chatContainer = document.getElementById('chat-container');
+let closet = JSON.parse(localStorage.getItem('closet')||'[]');
+const closetEl = document.getElementById('closet');
 
-  function addMessage(text, sender) {
-    const message = document.createElement('div');
-    message.classList.add('message', sender);
-    message.innerText = text;
-    chatContainer.appendChild(message);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-  }
+function save(){ localStorage.setItem('closet', JSON.stringify(closet)); }
 
-  function showTyping() {
-    const typing = document.createElement('div');
-    typing.classList.add('message', 'bot', 'typing');
-    typing.innerText = '상담사가 생각 중이에요...';
-    typing.id = 'typing';
-    chatContainer.appendChild(typing);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-  }
-
-  function removeTyping() {
-    const typing = document.getElementById('typing');
-    if (typing) typing.remove();
-  }
-
-  function sendMessage() {
-    const input = document.getElementById('input');
-    const text = input.value.trim();
-    if (!text) return;
-
-    addMessage(text, 'user');
-    input.value = '';
-
-    showTyping();
-
-    setTimeout(() => {
-      removeTyping();
-      const response = generateResponse(text);
-      addMessage(response, 'bot');
-    }, 1000);
-  }
-
-  function quickMessage(text) {
-    document.getElementById('input').value = text;
-    sendMessage();
-  }
-
-  function generateResponse(userText) {
-    const lower = userText.toLowerCase();
-
-    if (lower.includes('힘들')) {
-      return '많이 버티고 있었구나. 요즘 어떤 일이 가장 크게 힘들게 해?';
-    }
-
-    if (lower.includes('불안')) {
-      return '불안할 때는 생각이 계속 커지기 쉬워. 지금 머릿속에 가장 큰 걱정은 뭐야?';
-    }
-
-    if (lower.includes('외로')) {
-      return '외롭다는 느낌은 정말 무겁지. 요즘 혼자라고 느껴지는 순간이 언제야?';
-    }
-
-    if (lower.includes('괜찮')) {
-      return '괜찮아지고 싶다는 마음이 이미 중요한 시작이야. 지금 나아지기 위해 해보고 싶은 게 있을까?';
-    }
-
-    return '네 이야기를 더 듣고 싶어. 조금 더 자세히 말해줄 수 있을까?';
-  }
-
-  document.getElementById('input').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') sendMessage();
+function render(){
+  closetEl.innerHTML='';
+  closet.forEach(i=>{
+    const div=document.createElement('div');
+    div.innerText=`${i.name} (${i.season}/${i.thickness})`;
+    closetEl.appendChild(div);
   });
+}
 
-  // 초기 메시지
-  setTimeout(() => {
-    addMessage('안녕, 나는 너의 이야기를 들어주는 상담 챗봇이야. 지금 어떤 기분이야?', 'bot');
-  }, 500);
+function addItem(){
+  const item={
+    category:category.value,
+    season:season.value,
+    thickness:thickness.value,
+    name:name.value
+  };
+  closet.push(item);
+  save(); render();
+}
+
+function filterItems(cat, season, weather){
+  return closet.filter(i=>{
+    if(i.category!==cat) return false;
+    if(i.season!==season) return false;
+
+    if(weather==='hot' && i.thickness==='thick') return false;
+    if(weather==='cold' && i.thickness==='light') return false;
+
+    return true;
+  });
+}
+
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function recommend(){
+  const weather = document.getElementById('weather').value;
+  const season = document.getElementById('seasonSelect').value;
+
+  const tops = filterItems('top',season,weather);
+  const bottoms = filterItems('bottom',season,weather);
+  const outers = filterItems('outer',season,weather);
+  const shoes = filterItems('shoes',season,weather);
+
+  const result = document.getElementById('result');
+  result.innerHTML='';
+
+  if(!tops.length||!bottoms.length||!shoes.length){
+    result.innerHTML='옷이 부족해!'; return;
+  }
+
+  const top = pick(tops);
+  const bottom = pick(bottoms);
+  const shoe = pick(shoes);
+  const outer = (weather!=='hot' && outers.length)? pick(outers):null;
+
+  result.innerHTML=`
+    <div class='outfit'>
+      👕 ${top.name}<br>
+      👖 ${bottom.name}<br>
+      ${outer?`🧥 ${outer.name}<br>`:''}
+      👟 ${shoe.name}
+    </div>
+  `;
+}
+
+render();
 </script>
 
 </body>
