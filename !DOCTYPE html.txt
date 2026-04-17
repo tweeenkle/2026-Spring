@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive 심리 상담 채팅</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #eef2ff, #f8fafc);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      background-color: #7c9cff;
+      color: white;
+      padding: 16px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    #chat-container {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message {
+      max-width: 75%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      line-height: 1.5;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .user {
+      align-self: flex-end;
+      background-color: #7c9cff;
+      color: white;
+    }
+
+    .bot {
+      align-self: flex-start;
+      background-color: #e5e7eb;
+    }
+
+    .typing {
+      font-style: italic;
+      opacity: 0.7;
+    }
+
+    #input-area {
+      display: flex;
+      padding: 10px;
+      background-color: white;
+      border-top: 1px solid #ddd;
+    }
+
+    #input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    button {
+      margin-left: 10px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 20px;
+      background-color: #7c9cff;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background-color: #6a86e0;
+    }
+
+    #quick-buttons {
+      padding: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      background: #f1f5f9;
+      border-top: 1px solid #ddd;
+    }
+
+    .quick-btn {
+      padding: 8px 12px;
+      border-radius: 15px;
+      border: none;
+      background: #e0e7ff;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .quick-btn:hover {
+      background: #c7d2fe;
+    }
+  </style>
+</head>
+<body>
+
+<header>💬 인터랙티브 심리 상담</header>
+
+<div id="chat-container"></div>
+
+<div id="quick-buttons">
+  <button class="quick-btn" onclick="quickMessage('요즘 너무 힘들어요')">힘들어요</button>
+  <button class="quick-btn" onclick="quickMessage('불안해요')">불안해요</button>
+  <button class="quick-btn" onclick="quickMessage('외로워요')">외로워요</button>
+  <button class="quick-btn" onclick="quickMessage('괜찮아지고 싶어요')">괜찮아지고 싶어요</button>
+</div>
+
+<div id="input-area">
+  <input type="text" id="input" placeholder="편하게 이야기해 주세요...">
+  <button onclick="sendMessage()">전송</button>
+</div>
+
+<script>
+  const chatContainer = document.getElementById('chat-container');
+
+  function addMessage(text, sender) {
+    const message = document.createElement('div');
+    message.classList.add('message', sender);
+    message.innerText = text;
+    chatContainer.appendChild(message);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  function showTyping() {
+    const typing = document.createElement('div');
+    typing.classList.add('message', 'bot', 'typing');
+    typing.innerText = '상담사가 생각 중이에요...';
+    typing.id = 'typing';
+    chatContainer.appendChild(typing);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  function removeTyping() {
+    const typing = document.getElementById('typing');
+    if (typing) typing.remove();
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, 'user');
+    input.value = '';
+
+    showTyping();
+
+    setTimeout(() => {
+      removeTyping();
+      const response = generateResponse(text);
+      addMessage(response, 'bot');
+    }, 1000);
+  }
+
+  function quickMessage(text) {
+    document.getElementById('input').value = text;
+    sendMessage();
+  }
+
+  function generateResponse(userText) {
+    const lower = userText.toLowerCase();
+
+    if (lower.includes('힘들')) {
+      return '많이 버티고 있었구나. 요즘 어떤 일이 가장 크게 힘들게 해?';
+    }
+
+    if (lower.includes('불안')) {
+      return '불안할 때는 생각이 계속 커지기 쉬워. 지금 머릿속에 가장 큰 걱정은 뭐야?';
+    }
+
+    if (lower.includes('외로')) {
+      return '외롭다는 느낌은 정말 무겁지. 요즘 혼자라고 느껴지는 순간이 언제야?';
+    }
+
+    if (lower.includes('괜찮')) {
+      return '괜찮아지고 싶다는 마음이 이미 중요한 시작이야. 지금 나아지기 위해 해보고 싶은 게 있을까?';
+    }
+
+    return '네 이야기를 더 듣고 싶어. 조금 더 자세히 말해줄 수 있을까?';
+  }
+
+  document.getElementById('input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') sendMessage();
+  });
+
+  // 초기 메시지
+  setTimeout(() => {
+    addMessage('안녕, 나는 너의 이야기를 들어주는 상담 챗봇이야. 지금 어떤 기분이야?', 'bot');
+  }, 500);
+</script>
+
+</body>
+</html>
