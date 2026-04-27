@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>ReflectAI Final</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin:0;
+  font-family:'Gaegu', sans-serif;
+  background:linear-gradient(135deg,#ffd6e8,#ffeaf4);
+}
+
+/* 시작 */
+.start-screen {
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.start-card {
+  background:rgba(255,255,255,0.6);
+  backdrop-filter:blur(15px);
+  padding:40px;
+  border-radius:25px;
+  text-align:center;
+}
+
+.character {
+  font-size:60px;
+  animation:float 2s infinite;
+}
+
+@keyframes float {
+  0%{transform:translateY(0);}
+  50%{transform:translateY(-8px);}
+  100%{transform:translateY(0);}
+}
+
+.speech {
+  background:white;
+  padding:10px;
+  border-radius:15px;
+  margin:10px;
+}
+
+button {
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:15px;
+  background:#ffb6d9;
+}
+
+/* 카드 */
+.container {padding:20px;}
+.card {
+  background:white;
+  border-radius:20px;
+  padding:20px;
+  margin-top:20px;
+}
+
+/* 달력 */
+.calendar-header {
+  display:flex;
+  justify-content:space-between;
+}
+
+.calendar-grid {
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:5px;
+  margin-top:10px;
+}
+
+.day-name {
+  text-align:center;
+  font-size:12px;
+  color:#888;
+}
+
+.day {
+  padding:10px;
+  border-radius:10px;
+  text-align:center;
+  background:#fff0f6;
+  cursor:pointer;
+  position:relative;
+}
+
+.day.selected {
+  background:#ff8ecf;
+  color:white;
+}
+
+.day[data-score="2"]{background:#d4f8e8;}
+.day[data-score="0"]{background:#fff0f6;}
+.day[data-score="-2"]{background:#ffd6d6;}
+
+.day.has-record::after{
+  content:"●";
+  font-size:10px;
+  position:absolute;
+  bottom:4px;
+  right:5px;
+}
+
+/* 입력 */
+textarea {
+  width:100%;
+  border:none;
+  border-radius:10px;
+  padding:10px;
+  margin-top:5px;
+  background:#fff0f6;
+}
+
+.emoji {
+  font-size:24px;
+  cursor:pointer;
+  opacity:0.4;
+}
+.emoji.selected {
+  opacity:1;
+  transform:scale(1.2);
+}
+
+.hidden{display:none;}
+</style>
+</head>
+
+<body>
+
+<!-- 시작 -->
+<div id="main" class="start-screen">
+<div class="start-card">
+<div id="mainCharacter" class="character">😊</div>
+<div id="speechText" class="speech">오늘을 기록하러 가 볼까?</div>
+<h2>🌱 ReflectAI</h2>
+<button onclick="startWrite()">기록하기</button>
+<button onclick="showAnalysis()">분석</button>
+</div>
+</div>
+
+<!-- 기록 -->
+<div id="write" class="container hidden">
+<div class="card">
+
+<div id="writeCharacter" class="character">😊</div>
+
+<div class="calendar-header">
+<button onclick="prevMonth()">◀</button>
+<span id="monthLabel"></span>
+<button onclick="nextMonth()">▶</button>
+</div>
+
+<div class="calendar-grid" id="calendarGrid"></div>
+
+<div id="questions"></div>
+
+<h3>감정</h3>
+<div>
+<span class="emoji" onclick="selectEmoji(this,'😊',2)">😊</span>
+<span class="emoji" onclick="selectEmoji(this,'😍',2)">😍</span>
+<span class="emoji" onclick="selectEmoji(this,'😐',0)">😐</span>
+<span class="emoji" onclick="selectEmoji(this,'😴',0)">😴</span>
+<span class="emoji" onclick="selectEmoji(this,'😢',-2)">😢</span>
+<span class="emoji" onclick="selectEmoji(this,'😡',-2)">😡</span>
+</div>
+
+<button onclick="saveData()">저장</button>
+<button onclick="goHome()">뒤로</button>
+
+</div>
+</div>
+
+<!-- 분석 -->
+<div id="analysis" class="container hidden">
+<div class="card">
+<button onclick="analyze(7)">주간</button>
+<button onclick="analyze(30)">월간</button>
+
+<div id="result"></div>
+<canvas id="chart"></canvas>
+
+<h3>리포트</h3>
+<div id="report"></div>
+
+<button onclick="goHome()">뒤로</button>
+</div>
+</div>
+
+<script>
+
+// 질문
+const questionPool=[
+"오늘 가장 기억에 남는 순간은?",
+"오늘 감사했던 일은?",
+"오늘 잘한 점은?",
+"오늘의 작은 행복은?",
+"오늘 배운 것은?"
+];
+
+function getRandomQuestions(){
+return questionPool.sort(()=>0.5-Math.random()).slice(0,3);
+}
+
+// 상태
+let currentDate=new Date();
+let chosenDate=null;
+let selectedEmotion=null, selectedScore=0;
+let chart;
+
+// 시작
+function startWrite(){
+hideAll();
+document.getElementById("write").classList.remove("hidden");
+
+renderCalendar();
+
+// 질문 생성
+let qs=getRandomQuestions();
+let c=document.getElementById("questions");
+c.innerHTML="";
+qs.forEach((q,i)=>{
+c.innerHTML+=`<div>${q}</div><textarea id="q${i}"></textarea>`;
+});
+}
+
+// UI
+function hideAll(){
+["main","write","analysis"].forEach(id=>document.getElementById(id).classList.add("hidden"));
+}
+function goHome(){
+hideAll();
+document.getElementById("main").classList.remove("hidden");
+}
+
+// 달력
+const days=["SUN","MON","TUE","WED","THU","FRI","SAT"];
+
+function renderCalendar(){
+let grid=document.getElementById("calendarGrid");
+grid.innerHTML="";
+
+let y=currentDate.getFullYear(), m=currentDate.getMonth();
+document.getElementById("monthLabel").innerText=`${y} / ${m+1}`;
+
+days.forEach(d=>grid.innerHTML+=`<div class="day-name">${d}</div>`);
+
+let first=new Date(y,m,1).getDay();
+let last=new Date(y,m+1,0).getDate();
+
+let records=JSON.parse(localStorage.getItem("records"))||[];
+
+for(let i=0;i<first;i++) grid.innerHTML+="<div></div>";
+
+for(let d=1;d<=last;d++){
+let ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+let rec=records.find(r=>r.date===ds);
+
+grid.innerHTML+=`<div class="day ${rec?'has-record':''}" data-score="${rec?rec.score:''}" onclick="selectDate('${ds}',this)">${d}</div>`;
+}
+}
+
+function selectDate(date,el){
+document.querySelectorAll(".day").forEach(d=>d.classList.remove("selected"));
+el.classList.add("selected");
+chosenDate=date;
+loadData(date);
+}
+
+function prevMonth(){currentDate.setMonth(currentDate.getMonth()-1);renderCalendar();}
+function nextMonth(){currentDate.setMonth(currentDate.getMonth()+1);renderCalendar();}
+
+// 저장
+function saveData(){
+let answers=[];
+for(let i=0;i<3;i++) answers.push(document.getElementById(`q${i}`).value);
+
+let date=chosenDate||new Date().toISOString().split("T")[0];
+
+let records=JSON.parse(localStorage.getItem("records"))||[];
+let idx=records.findIndex(r=>r.date===date);
+
+let data={date,text:answers.join("||"),emotion:selectedEmotion,score:selectedScore};
+
+if(idx!=-1) records[idx]=data;
+else records.push(data);
+
+localStorage.setItem("records",JSON.stringify(records));
+alert("저장 완료 🌸");
+renderCalendar();
+}
+
+// 불러오기
+function loadData(date){
+let records=JSON.parse(localStorage.getItem("records"))||[];
+let f=records.find(r=>r.date===date);
+if(!f) return;
+
+let texts=f.text.split("||");
+for(let i=0;i<3;i++){
+if(document.getElementById(`q${i}`))
+document.getElementById(`q${i}`).value=texts[i]||"";
+}
+
+selectedEmotion=f.emotion;
+selectedScore=f.score;
+}
+
+// 감정
+function selectEmoji(el,e,s){
+document.querySelectorAll(".emoji").forEach(x=>x.classList.remove("selected"));
+el.classList.add("selected");
+selectedEmotion=e; selectedScore=s;
+
+const map={"😊":"😄","😍":"🥰","😐":"😶","😴":"😪","😢":"🥺","😡":"😤"};
+document.getElementById("writeCharacter").innerText=map[e];
+}
+
+// 분석
+function showAnalysis(){
+hideAll();
+document.getElementById("analysis").classList.remove("hidden");
+}
+
+function analyze(days){
+let rec=JSON.parse(localStorage.getItem("records"))||[];
+let now=new Date();
+
+let f=rec.filter(r=>(now-new Date(r.date))/(1000*60*60*24)<=days);
+
+let scores=f.map(r=>r.score);
+let labels=f.map(r=>r.date);
+
+let avg=scores.reduce((a,b)=>a+b,0)/(scores.length||1);
+
+document.getElementById("result").innerText=
+avg>1?"😊 긍정적":avg<-1?"😢 지침":"😐 안정";
+
+if(chart) chart.destroy();
+
+chart=new Chart(document.getElementById("chart"),{
+type:'line',
+data:{labels:labels,datasets:[{data:scores,label:'감정'}]}
+});
+
+generateReport(f,avg);
+}
+
+function generateReport(data,avg){
+let t="";
+if(avg>1)t+="이번 기간은 긍정적 🌸<br>";
+else if(avg<-1)t+="조금 지침 😢<br>";
+else t+="안정적 😐<br>";
+t+=`기록 수: ${data.length}일`;
+document.getElementById("report").innerHTML=t;
+}
+
+// 시간 캐릭터
+function setCharacterByTime(){
+let h=new Date().getHours();
+let c="😊", m="오늘 기록할까?";
+if(h<12){c="😊";m="좋은 아침 ☀️";}
+else if(h<18){c="😄";m="오늘 잘 보내고 있어?";}
+else if(h<22){c="😌";m="오늘 어땠어?";}
+else{c="😴";m="마무리 🌙";}
+document.getElementById("mainCharacter").innerText=c;
+document.getElementById("speechText").innerText=m;
+}
+
+setCharacterByTime();
+
+</script>
+</body>
+</html>
