@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>ReflectAI Ultimate Final</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Dongle:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin:0;
+  font-family:'Dongle','Gaegu', sans-serif;
+  background:linear-gradient(135deg,#ffd6e8,#ffeaf4);
+}
+
+.hidden {display:none !important;}
+
+.start-screen {
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.start-card {
+  background:rgba(255,255,255,0.6);
+  backdrop-filter:blur(15px);
+  padding:40px;
+  border-radius:25px;
+  text-align:center;
+}
+
+.character {
+  font-size:60px;
+  animation:float 2s infinite;
+}
+
+@keyframes float {
+  0%{transform:translateY(0);}
+  50%{transform:translateY(-8px);}
+  100%{transform:translateY(0);}
+}
+
+button {
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:15px;
+  background:#ffb6d9;
+  cursor:pointer;
+  font-family:'Dongle', sans-serif;
+  font-size:20px;
+}
+
+.tutorial-btn {
+  background:#ff8ecf;
+}
+
+.tutorial-btn:hover {
+  background:#ff6fc1;
+}
+
+.container {padding:20px;}
+.card {
+  background:white;
+  border-radius:20px;
+  padding:20px;
+  margin-top:20px;
+}
+
+/* 달력 */
+.calendar-title-row {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+}
+
+.calendar-title {
+  font-size:28px;
+  font-weight:bold;
+}
+
+.calendar-header {
+  display:flex;
+  justify-content:space-between;
+}
+
+.calendar-nav-btn {
+  width:40px;
+  padding:6px;
+  border-radius:10px;
+}
+
+.calendar-nav-btn:hover {
+  transform:scale(1.1);
+  background:#ffa3d1;
+}
+
+.calendar-grid {
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:5px;
+  margin-top:10px;
+  text-align:center;
+}
+
+.day {
+  padding:10px;
+  border-radius:10px;
+  background:#fff0f6;
+  cursor:pointer;
+  position:relative;
+}
+
+.day.selected {background:#ff8ecf;color:white;}
+.day.today {border:2px solid hotpink;}
+
+.day.has-record::after{
+  content:"●";
+  font-size:10px;
+  position:absolute;
+  bottom:4px;
+  right:5px;
+  color:hotpink;
+}
+
+/* 입력 */
+textarea {
+  width:100%;
+  border:none;
+  border-radius:10px;
+  padding:10px;
+  margin-top:5px;
+  background:#fff0f6;
+  font-family:'Dongle', sans-serif;
+  font-size:18px;
+}
+
+.emoji {
+  font-size:26px;
+  cursor:pointer;
+  opacity:0.4;
+}
+.emoji.selected {
+  opacity:1;
+  transform:scale(1.2);
+}
+
+/* 튜토리얼 */
+.tutorial-overlay {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+
+.tutorial-box {
+  background:white;
+  padding:30px;
+  border-radius:20px;
+  width:80%;
+  max-width:320px;
+  text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 튜토리얼 -->
+<div id="tutorial" class="tutorial-overlay hidden">
+  <div class="tutorial-box">
+    <div id="tutorialText"></div>
+    <button onclick="nextTutorial()">다음</button>
+  </div>
+</div>
+
+<!-- 메인 -->
+<div id="main" class="start-screen">
+<div class="start-card">
+<div id="mainCharacter" class="character">🌱</div>
+<h2>🌸 ReflectAI</h2>
+<div id="streak"></div>
+
+<button onclick="startWrite()">기록하기</button>
+<button onclick="showAnalysis()">분석</button>
+<button class="tutorial-btn" onclick="startTutorial()">튜토리얼 보기</button>
+
+</div>
+</div>
+
+<!-- 기록 -->
+<div id="write" class="container hidden">
+<div class="card">
+
+<div class="calendar-title-row">
+<div id="writeCharacter" class="character">🌱</div>
+<div id="monthLabel" class="calendar-title"></div>
+</div>
+
+<div class="calendar-header">
+<button class="calendar-nav-btn" onclick="prevMonth()">◀</button>
+<button class="calendar-nav-btn" onclick="nextMonth()">▶</button>
+</div>
+
+<div id="dayNames" class="calendar-grid"></div>
+<div id="calendarGrid" class="calendar-grid"></div>
+
+<div id="questions"></div>
+
+<h3>감정</h3>
+<div>
+<span class="emoji" onclick="selectEmoji(this,'😊',2)">😊</span>
+<span class="emoji" onclick="selectEmoji(this,'😍',2)">😍</span>
+<span class="emoji" onclick="selectEmoji(this,'😐',0)">😐</span>
+<span class="emoji" onclick="selectEmoji(this,'😴',0)">😴</span>
+<span class="emoji" onclick="selectEmoji(this,'😢',-2)">😢</span>
+<span class="emoji" onclick="selectEmoji(this,'😡',-2)">😡</span>
+</div>
+
+<button onclick="saveData()">저장</button>
+<button onclick="goHome()">뒤로</button>
+
+<div id="aiFeedback"></div>
+
+</div>
+</div>
+
+<!-- 분석 -->
+<div id="analysis" class="container hidden">
+<div class="card">
+<button onclick="analyze()">분석 실행</button>
+<canvas id="chart"></canvas>
+<button onclick="goHome()">뒤로</button>
+</div>
+</div>
+
+<script>
+let currentDate=new Date();
+let chosenDate=null;
+let selectedScore=0;
+let chart;
+
+/* 튜토리얼 */
+const tutorialSteps = [
+"🌱 ReflectAI에 온 걸 환영해!",
+"📅 날짜를 선택해서 기록할 수 있어",
+"✏️ 질문에 답하면서 하루를 돌아봐",
+"😊 감정을 선택하면 분석이 정확해져",
+"🔥 꾸준히 기록하면 streak가 쌓여",
+"🌸 이제 시작해보자!"
+];
+
+let tutorialIndex=0;
+
+function startTutorial(){
+const t=document.getElementById("tutorial");
+t.classList.remove("hidden");
+tutorialIndex=0;
+document.getElementById("tutorialText").innerText=tutorialSteps[0];
+}
+
+function nextTutorial(){
+tutorialIndex++;
+if(tutorialIndex>=tutorialSteps.length){
+document.getElementById("tutorial").classList.add("hidden");
+localStorage.setItem("tutorialDone","true");
+return;
+}
+document.getElementById("tutorialText").innerText=tutorialSteps[tutorialIndex];
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+if(!localStorage.getItem("tutorialDone")){
+startTutorial();
+}
+});
+
+/* 질문 */
+const questionPool=[
+"오늘 가장 기억에 남는 순간은?",
+"오늘 감사했던 일은?",
+"오늘 잘한 점은?"
+];
+
+function getRandomQuestions(){
+return questionPool.sort(()=>0.5-Math.random()).slice(0,3);
+}
+
+/* 화면 */
+function hideAll(){
+["main","write","analysis"].forEach(id=>document.getElementById(id).classList.add("hidden"));
+}
+function goHome(){
+hideAll();
+document.getElementById("main").classList.remove("hidden");
+updateStreak();
+}
+function startWrite(){
+hideAll();
+document.getElementById("write").classList.remove("hidden");
+renderCalendar();
+
+let qs=getRandomQuestions();
+let box=document.getElementById("questions");
+box.innerHTML="";
+qs.forEach((q,i)=>{
+box.innerHTML+=`<div>${q}</div><textarea id="q${i}"></textarea>`;
+});
+}
+function showAnalysis(){
+hideAll();
+document.getElementById("analysis").classList.remove("hidden");
+}
+
+/* 달력 */
+function renderCalendar(){
+let grid=document.getElementById("calendarGrid");
+let names=document.getElementById("dayNames");
+
+grid.innerHTML="";
+names.innerHTML="";
+
+const days=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+days.forEach(d=>{
+names.innerHTML+=`<div style="font-size:12px;color:#888">${d}</div>`;
+});
+
+let y=currentDate.getFullYear();
+let m=currentDate.getMonth();
+
+document.getElementById("monthLabel").innerText=`${y} / ${m+1}`;
+
+let first=new Date(y,m,1).getDay();
+let last=new Date(y,m+1,0).getDate();
+
+let today=new Date();
+let records=JSON.parse(localStorage.getItem("records"))||[];
+
+for(let i=0;i<first;i++) grid.innerHTML+="<div></div>";
+
+for(let d=1;d<=last;d++){
+let ds=`${y}-${m+1}-${d}`;
+let isToday=(today.getFullYear()==y && today.getMonth()==m && today.getDate()==d);
+let hasRecord=records.find(r=>r.date===ds);
+
+grid.innerHTML+=`
+<div class="day ${isToday?'today':''} ${hasRecord?'has-record':''}"
+onclick="selectDate('${ds}',this)">
+${d}
+</div>`;
+}
+}
+
+function prevMonth(){currentDate.setMonth(currentDate.getMonth()-1);renderCalendar();}
+function nextMonth(){currentDate.setMonth(currentDate.getMonth()+1);renderCalendar();}
+
+function selectDate(date,el){
+document.querySelectorAll(".day").forEach(d=>d.classList.remove("selected"));
+el.classList.add("selected");
+chosenDate=date;
+}
+
+/* 저장 */
+function saveData(){
+let text="";
+for(let i=0;i<3;i++){
+text+=document.getElementById(`q${i}`).value+" ";
+}
+
+let date=chosenDate || new Date().toISOString().split("T")[0];
+
+let records=JSON.parse(localStorage.getItem("records"))||[];
+records.push({date,text,score:selectedScore});
+
+localStorage.setItem("records",JSON.stringify(records));
+
+aiFeedback(text);
+updateStreak();
+}
+
+/* AI */
+function aiFeedback(text){
+document.getElementById("aiFeedback").innerText=
+text.length>30 ? "오늘 기록 정말 잘했어 🌸" : "조금만 더 써보면 좋아 😊";
+}
+
+/* 감정 */
+function selectEmoji(el,e,s){
+document.querySelectorAll(".emoji").forEach(x=>x.classList.remove("selected"));
+el.classList.add("selected");
+selectedScore=s;
+}
+
+/* streak */
+function updateStreak(){
+let rec=JSON.parse(localStorage.getItem("records"))||[];
+document.getElementById("streak").innerText=`🔥 ${rec.length}일 기록`;
+}
+
+/* 분석 */
+function analyze(){
+let rec=JSON.parse(localStorage.getItem("records"))||[];
+let labels=rec.map(r=>r.date);
+let values=rec.map(r=>r.score);
+
+if(chart) chart.destroy();
+chart=new Chart(document.getElementById("chart"),{
+type:'line',
+data:{labels:labels,datasets:[{data:values,label:'감정'}]}
+});
+}
+
+updateStreak();
+</script>
+</body>
+</html>
