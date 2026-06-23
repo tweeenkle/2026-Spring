@@ -6,6 +6,7 @@
 <title>ReflectAI - SEED Design (Pink)</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 
@@ -445,6 +446,352 @@ textarea:hover:not(:focus) {
   height: 250px !important;
   margin-top: 24px;
 }
+
+/* Google Sign-in / Custom Header */
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--seed-stroke-neutral-muted);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.user-profile-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.profile-img {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--seed-radius-full);
+  object-fit: cover;
+  border: 1.5px solid var(--seed-bg-brand-solid);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.profile-img:hover {
+  transform: scale(1.05);
+}
+.profile-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--seed-radius-full);
+  background-color: var(--seed-bg-neutral-weak);
+  color: var(--seed-fg-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.profile-placeholder:hover {
+  background-color: var(--seed-bg-neutral-weak-pressed);
+  transform: scale(1.05);
+}
+
+/* Tabs */
+.tabs-container {
+  display: flex;
+  background: var(--seed-bg-neutral-weak);
+  padding: 4px;
+  border-radius: var(--seed-radius-r3);
+  margin-bottom: 20px;
+  position: relative;
+}
+.tab-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: var(--seed-radius-r2);
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--seed-fg-neutral-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.tab-btn.active {
+  background: var(--seed-bg-layer-default);
+  color: var(--seed-fg-brand);
+  box-shadow: var(--seed-shadow-s3);
+}
+
+/* Locked Overlay */
+.premium-locked-container {
+  position: relative;
+  border-radius: var(--seed-radius-r4);
+  padding: 24px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--seed-stroke-neutral-muted);
+  min-height: 400px;
+}
+.premium-locked-blur {
+  filter: blur(8px);
+  pointer-events: none;
+  opacity: 0.4;
+  user-select: none;
+}
+.premium-locked-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 24px;
+  box-sizing: border-box;
+  z-index: 5;
+  text-align: center;
+}
+.premium-lock-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--seed-radius-r4);
+  padding: 28px 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 142, 207, 0.3);
+  max-width: 320px;
+  width: 100%;
+  box-sizing: border-box;
+  animation: float 4s ease-in-out infinite;
+}
+.premium-lock-features {
+  text-align: left;
+  margin: 16px 0 24px;
+  font-size: 14px;
+  color: var(--seed-fg-neutral-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 0;
+  list-style: none;
+}
+.premium-lock-features li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.premium-lock-features li span {
+  color: var(--seed-fg-brand);
+  font-size: 18px;
+}
+
+/* Payment Sheet */
+.payment-sheet-box {
+  width: 100%;
+  max-width: 360px;
+  background: var(--seed-bg-layer-default);
+  border-radius: var(--seed-radius-r4);
+  padding: 24px;
+  box-shadow: var(--seed-shadow-s3);
+  text-align: left;
+  animation: slideUp 0.3s var(--seed-timing-enter);
+}
+@keyframes slideUp {
+  from { transform: translateY(100px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.payment-methods-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 20px 0;
+}
+.payment-method-btn {
+  border: 1.5px solid var(--seed-stroke-neutral-muted);
+  border-radius: var(--seed-radius-r3);
+  padding: 12px;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+.payment-method-btn:hover {
+  background: var(--seed-bg-neutral-weak);
+  border-color: var(--seed-bg-brand-weak);
+}
+.payment-method-btn.selected {
+  border-color: var(--seed-bg-brand-solid);
+  background: rgba(255, 142, 207, 0.08);
+  color: var(--seed-fg-brand);
+}
+.pay-icon-card { color: #555d6d; }
+.pay-icon-kakao { color: #3c1e1e; background: #f7e600; border-radius: 4px; padding: 1px 4px; font-size: 10px; font-weight: 800; }
+.pay-icon-toss { color: #0064ff; font-weight: 900; }
+.pay-icon-naver { color: #03cf5d; font-weight: 900; }
+
+/* Loading Spinner */
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--seed-bg-neutral-weak);
+  border-top-color: var(--seed-bg-brand-solid);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Premium Dashboard UI */
+.premium-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-top: 16px;
+}
+.premium-card {
+  background: #ffffff;
+  border-radius: var(--seed-radius-r4);
+  padding: 20px;
+  border: 1px solid var(--seed-stroke-neutral-muted);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+.premium-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--seed-fg-neutral);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.premium-card-title span {
+  color: var(--seed-fg-brand);
+  font-size: 20px;
+}
+
+/* Progress Rings for Emotions */
+.emotion-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.emotion-stat-item {
+  background: var(--seed-bg-neutral-weak);
+  border-radius: var(--seed-radius-r3);
+  padding: 12px 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.emotion-stat-emoji {
+  font-size: 24px;
+}
+.emotion-stat-pct {
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--seed-fg-neutral);
+}
+.emotion-stat-label {
+  font-size: 11px;
+  color: var(--seed-fg-neutral-muted);
+}
+
+/* Weather UI */
+.weather-display {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.weather-icon-box {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--seed-radius-r4);
+  background: var(--seed-bg-neutral-weak);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.weather-icon-box span {
+  font-size: 36px;
+  color: var(--seed-fg-brand);
+}
+.weather-info {
+  flex: 1;
+}
+.weather-status {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--seed-fg-neutral);
+}
+.weather-desc {
+  font-size: 13px;
+  color: var(--seed-fg-neutral-muted);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* Day-of-week custom bar chart */
+.dow-chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dow-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.dow-label {
+  width: 24px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--seed-fg-neutral-muted);
+}
+.dow-bar-bg {
+  flex: 1;
+  height: 12px;
+  background: var(--seed-bg-neutral-weak);
+  border-radius: var(--seed-radius-full);
+  overflow: hidden;
+  position: relative;
+}
+.dow-bar-fill {
+  height: 100%;
+  background: var(--seed-bg-brand-solid);
+  border-radius: var(--seed-radius-full);
+  transition: width 0.8s ease-out;
+}
+.dow-value {
+  width: 32px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: right;
+  color: var(--seed-fg-neutral);
+}
 </style>
 </head>
 <body>
@@ -460,8 +807,196 @@ textarea:hover:not(:focus) {
     </div>
   </div>
 
+  <!-- 프로필 / 설정 모달 -->
+  <div id="profileModal" class="dialog-overlay">
+    <div class="dialog-box" style="text-align: left; padding: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 class="t-h2" id="profileModalTitle" style="font-size: 18px;">사용자 프로필</h3>
+        <button class="icon-btn" onclick="closeModal('profileModal')">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+      
+      <!-- 로그인 안 된 상태 -->
+      <div id="modalLoggedOutState">
+        <p class="t-body" style="font-size: 14px; margin-bottom: 16px;">
+          구글 계정으로 로그인하여 데이터를 동기화하고 맞춤 분석을 받아보세요.
+        </p>
+        
+        <!-- Google Sign-in Button wrapper -->
+        <div id="googleBtnWrapper" style="margin-bottom: 16px; display: flex; justify-content: center; min-height: 40px; align-items: center; border: 1px solid var(--seed-stroke-neutral-muted); border-radius: var(--seed-radius-r2); cursor: pointer;" onclick="tryRealGoogleLogin()">
+          <svg viewBox="0 0 24 24" width="20" height="20" style="margin-right: 8px;">
+            <path d="M21.35,11.1H12v2.7h5.38c-0.24,1.28 -0.96,2.37 -2.04,3.1v2.58h3.3c1.93,-1.78 3.04,-4.4 3.04,-7.48c0,-0.6 -0.05,-1.18 -0.16,-1.7c-0.02,0.1 0.03,-0.1 0.03,-0.2Z" fill="#4285F4"/>
+            <path d="M12,21c2.43,0 4.47,-0.8 5.96,-2.2l-3.3,-2.58c-0.9,0.6 -2.07,0.98 -3.3,0.98c-2.34,0 -4.33,-1.58 -5.04,-3.7H2.94v2.66C4.42,18.42 8.01,21 12,21Z" fill="#34A853"/>
+            <path d="M6.96,13.5c-0.18,-0.54 -0.29,-1.12 -0.29,-1.72s0.1,-1.18 0.29,-1.72V7.4H2.94C2.33,8.62 2,10.02 2,11.5s0.33,2.88 0.94,4.1l4.02,-3.1Z" fill="#FBBC05"/>
+            <path d="M12,6.54c1.32,0 2.5,0.45 3.44,1.35l2.58,-2.58C16.46,3.88 14.42,3 12,3C8.01,3 4.42,5.58 2.94,8.84l4.02,3.1c0.7,-2.12 2.7,-3.7 5.04,-3.7Z" fill="#EA4335"/>
+          </svg>
+          <span style="font-weight: 700; font-size: 14px; color: var(--seed-fg-neutral-muted);">Google 계정으로 로그인</span>
+        </div>
+        
+        <button class="btn btn-neutral-weak btn-medium" onclick="showGoogleSimulator()" style="margin-bottom: 24px;">
+          <span class="material-symbols-rounded">smart_toy</span>
+          구글 로그인 시뮬레이터 실행
+        </button>
+        
+        <hr style="border:none; border-top: 1px solid var(--seed-stroke-neutral-muted); margin: 16px 0;">
+        
+        <div class="question-label" style="font-size: 14px; margin-top: 16px; font-weight: 700;">
+          <span class="material-symbols-rounded" style="font-size: 18px;">settings</span>
+          Google Client ID 설정 (실제 연동용)
+        </div>
+        <input type="text" id="clientIdInput" placeholder="Google Client ID 입력" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--seed-stroke-neutral-muted); box-sizing:border-box; font-size:13px; margin-bottom:8px; font-family: inherit;">
+        <button class="btn btn-neutral-outline btn-medium" onclick="saveClientId()" style="font-size:13px; min-height:36px;">Client ID 저장</button>
+      </div>
+      
+      <!-- 로그인 된 상태 -->
+      <div id="modalLoggedInState" style="display: none;">
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+          <img id="modalProfileImg" src="" class="profile-img" style="width: 56px; height: 56px; border-width: 2px;">
+          <div style="overflow: hidden;">
+            <div id="modalProfileName" class="t-h2" style="font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">사용자 이름</div>
+            <div id="modalProfileEmail" class="t-body" style="font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--seed-fg-neutral-muted);">user@email.com</div>
+          </div>
+        </div>
+        
+        <div id="paymentStatusBox" style="background: var(--seed-bg-neutral-weak); padding: 12px 16px; border-radius: var(--seed-radius-r3); margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
+          <span class="material-symbols-rounded" id="paymentBadgeIcon" style="color: var(--seed-fg-brand); font-size: 20px;">verified</span>
+          <span id="paymentStatusText" style="font-weight: 700; font-size: 14px; color: var(--seed-fg-neutral);">기본 회원 (일반 감정 리포트)</span>
+        </div>
+        
+        <button class="btn btn-neutral-outline btn-medium" onclick="handleLogout()">
+          <span class="material-symbols-rounded">logout</span>
+          로그아웃
+        </button>
+      </div>
+      
+      <!-- 디버그/개발자용 리셋 -->
+      <hr style="border:none; border-top: 1px solid var(--seed-stroke-neutral-muted); margin: 20px 0;">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+        <span style="font-size: 11px; color: var(--seed-fg-neutral-muted); line-height: 1.3;">테스트 상태 초기화:</span>
+        <button class="btn btn-neutral-outline btn-medium" onclick="resetAllStates()" style="font-size: 11px; width: auto; min-height: 28px; padding: 0 10px; border-color: #ff6b6b; color: #ff6b6b; font-weight: 500;">
+          데이터 및 결제 전체 리셋
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 구글 로그인 시뮬레이터 모달 -->
+  <div id="googleSimulatorModal" class="dialog-overlay">
+    <div class="dialog-box" style="text-align: left; padding: 24px; max-width: 320px;">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+        <svg viewBox="0 0 24 24" width="24" height="24" style="display: block;">
+          <path d="M21.35,11.1H12v2.7h5.38c-0.24,1.28 -0.96,2.37 -2.04,3.1v2.58h3.3c1.93,-1.78 3.04,-4.4 3.04,-7.48c0,-0.6 -0.05,-1.18 -0.16,-1.7c-0.02,0.1 0.03,-0.1 0.03,-0.2Z" fill="#4285F4"/>
+          <path d="M12,21c2.43,0 4.47,-0.8 5.96,-2.2l-3.3,-2.58c-0.9,0.6 -2.07,0.98 -3.3,0.98c-2.34,0 -4.33,-1.58 -5.04,-3.7H2.94v2.66C4.42,18.42 8.01,21 12,21Z" fill="#34A853"/>
+          <path d="M6.96,13.5c-0.18,-0.54 -0.29,-1.12 -0.29,-1.72s0.1,-1.18 0.29,-1.72V7.4H2.94C2.33,8.62 2,10.02 2,11.5s0.33,2.88 0.94,4.1l4.02,-3.1Z" fill="#FBBC05"/>
+          <path d="M12,6.54c1.32,0 2.5,0.45 3.44,1.35l2.58,-2.58C16.46,3.88 14.42,3 12,3C8.01,3 4.42,5.58 2.94,8.84l4.02,3.1c0.7,-2.12 2.7,-3.7 5.04,-3.7Z" fill="#EA4335"/>
+        </svg>
+        <span style="font-weight: 700; font-size: 16px; color: #3c4043;">Google 계정으로 로그인</span>
+      </div>
+      
+      <p class="t-body" style="font-size: 13px; color: #5f6368; margin-bottom: 20px; line-height: 1.4;">
+        ReflectAI 모의 구글 로그인 화면입니다. 원하는 프로필 정보를 입력해 로그인 흐름을 확인해 보세요.
+      </p>
+      
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+        <div>
+          <label style="font-size: 11px; font-weight: 700; color: #5f6368; display: block; margin-bottom: 4px;">이름</label>
+          <input type="text" id="simNameInput" value="홍채빈" style="width:100%; padding:10px; border-radius:4px; border:1px solid #dadce0; box-sizing:border-box; font-size:14px; font-family: inherit;">
+        </div>
+        <div>
+          <label style="font-size: 11px; font-weight: 700; color: #5f6368; display: block; margin-bottom: 4px;">이메일</label>
+          <input type="email" id="simEmailInput" value="chaevin@gmail.com" style="width:100%; padding:10px; border-radius:4px; border:1px solid #dadce0; box-sizing:border-box; font-size:14px; font-family: inherit;">
+        </div>
+      </div>
+      
+      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+        <button class="btn btn-neutral-outline btn-medium" onclick="closeModal('googleSimulatorModal')" style="width: auto; min-height: 36px; padding: 0 16px; border: none; font-size: 13px; font-weight: 600;">취소</button>
+        <button class="btn btn-brand-solid btn-medium" onclick="submitGoogleSimulator()" style="width: auto; min-height: 36px; padding: 0 16px; background-color: #1a73e8; font-size: 13px; font-weight: 600;">로그인 완료</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 결제 모달 -->
+  <div id="paymentModal" class="dialog-overlay">
+    <div class="payment-sheet-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 class="t-h2" style="font-size: 18px; display: flex; align-items: center; gap: 8px;">
+          <span class="material-symbols-rounded" style="color: var(--seed-fg-brand);">credit_card</span>
+          프리미엄 결제하기
+        </h3>
+        <button class="icon-btn" onclick="closeModal('paymentModal')">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+
+      <!-- 결제 수단 선택 영역 -->
+      <div id="paymentSelectArea">
+        <div style="background: var(--seed-bg-neutral-weak); padding: 12px 16px; border-radius: var(--seed-radius-r3); margin-bottom: 16px;">
+          <div style="font-size: 12px; color: var(--seed-fg-neutral-muted);">상품명</div>
+          <div style="font-weight: 700; font-size: 15px; color: var(--seed-fg-neutral); margin-top: 2px;">ReflectAI 프리미엄 평생 소장권</div>
+          <div style="font-weight: 800; font-size: 18px; color: var(--seed-fg-brand); margin-top: 6px;">9,900원 <span style="font-size:12px; font-weight:400; color:var(--seed-fg-neutral-muted);">(일시불)</span></div>
+        </div>
+
+        <div style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--seed-fg-neutral);">결제 수단 선택</div>
+        <div class="payment-methods-grid">
+          <button class="payment-method-btn selected" onclick="selectPaymentMethod('card', this)">
+            <span class="material-symbols-rounded pay-icon-card">credit_card</span>
+            신용/체크카드
+          </button>
+          <button class="payment-method-btn" onclick="selectPaymentMethod('kakao', this)">
+            <span class="pay-icon-kakao">pay</span>
+            카카오페이
+          </button>
+          <button class="payment-method-btn" onclick="selectPaymentMethod('toss', this)">
+            <span class="pay-icon-toss">toss</span>
+            토스페이
+          </button>
+          <button class="payment-method-btn" onclick="selectPaymentMethod('naver', this)">
+            <span class="pay-icon-naver">N Pay</span>
+            네이버페이
+          </button>
+        </div>
+
+        <button class="btn btn-brand-solid btn-large" onclick="processPayment()" style="margin-top: 16px;">
+          결제하기 (9,900원)
+        </button>
+      </div>
+
+      <!-- 결제 로딩 영역 -->
+      <div id="paymentLoadingArea" class="spinner-container" style="display: none;">
+        <div class="spinner"></div>
+        <h4 class="t-h2" id="paymentLoadingStatus" style="font-size: 16px;">안전하게 결제를 진행하고 있습니다...</h4>
+        <p class="t-body" style="font-size: 13px; margin-top: 8px;">잠시만 기다려 주세요. 창을 닫지 마세요.</p>
+      </div>
+
+      <!-- 결제 완료 영역 -->
+      <div id="paymentSuccessArea" style="display: none; text-align: center; padding: 20px 10px;">
+        <span class="material-symbols-rounded" style="font-size: 56px; color: var(--seed-fg-brand); margin-bottom: 16px; display: block;">verified</span>
+        <h4 class="t-h2" style="font-size: 20px; margin-bottom: 8px;">결제 완료!</h4>
+        <p class="t-body" style="font-size: 13px; margin-bottom: 24px; line-height: 1.5; color: var(--seed-fg-neutral-muted);">
+          ReflectAI 프리미엄 평생 소장권 결제가 성공적으로 처리되었습니다.<br>지금부터 개인 감정 파악 리포트를 무제한 이용할 수 있습니다.
+        </p>
+        <button class="btn btn-brand-solid btn-medium" onclick="finishPaymentFlow()">
+          리포트 확인하러 가기
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- 메인 스크린 -->
   <div id="mainScreen" class="screen active">
+    <div class="main-header">
+      <div class="logo-area">
+        <span class="material-symbols-rounded" style="color: var(--seed-fg-brand); font-size: 24px;">local_florist</span>
+        <span style="font-weight: 800; font-size: 18px; color: var(--seed-fg-neutral);">ReflectAI</span>
+      </div>
+      <div class="user-profile-area" id="userProfileArea">
+        <div class="profile-placeholder" onclick="openProfileModal()">
+          <span class="material-symbols-rounded" style="font-size: 20px;">account_circle</span>
+        </div>
+      </div>
+    </div>
+
     <div class="start-content">
       <div class="main-illustration">
         <span class="material-symbols-rounded">local_florist</span>
@@ -562,8 +1097,127 @@ textarea:hover:not(:focus) {
     </div>
     
     <div class="content-padding">
-      <p class="t-body">최근 기록된 감정 변화를 그래프로 확인하세요.</p>
-      <canvas id="chart"></canvas>
+      <!-- Tabs -->
+      <div class="tabs-container">
+        <button class="tab-btn active" id="tabBtnBasic" onclick="switchAnalysisTab('basic')">
+          <span class="material-symbols-rounded" style="font-size: 18px;">monitoring</span>
+          기본 트렌드
+        </button>
+        <button class="tab-btn" id="tabBtnPremium" onclick="switchAnalysisTab('premium')">
+          <span class="material-symbols-rounded" style="font-size: 18px;">auto_awesome</span>
+          프리미엄 리포트
+        </button>
+      </div>
+
+      <!-- Basic Content -->
+      <div id="analysisBasicContent">
+        <p class="t-body" style="margin-bottom: 16px;">최근 기록된 감정 변화를 그래프로 확인하세요.</p>
+        <canvas id="chart"></canvas>
+      </div>
+
+      <!-- Premium Content -->
+      <div id="analysisPremiumContent" style="display: none;">
+        <!-- Locked View (If not paid) -->
+        <div id="premiumLockedView" class="premium-locked-container">
+          <!-- Blurry dummy cards to make it look like a locked dashboard -->
+          <div class="premium-locked-blur">
+            <div class="premium-card">
+              <div class="premium-card-title">☀️ 오늘의 감정 날씨</div>
+              <div class="weather-display">
+                <div class="weather-icon-box"><span>sunny</span></div>
+                <div class="weather-info">
+                  <div class="weather-status">대체로 맑음</div>
+                  <div style="height:10px; background:#ddd; border-radius:4px; margin-top:6px; width:70%;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="premium-card">
+              <div class="premium-card-title">📊 이모지별 누적 비율</div>
+              <div class="emotion-stats-grid">
+                <div class="emotion-stat-item"><div class="emotion-stat-emoji">😍</div><div class="emotion-stat-pct">45%</div></div>
+                <div class="emotion-stat-item"><div class="emotion-stat-emoji">😊</div><div class="emotion-stat-pct">30%</div></div>
+                <div class="emotion-stat-item"><div class="emotion-stat-emoji">😐</div><div class="emotion-stat-pct">25%</div></div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Locked Card Overlay -->
+          <div class="premium-locked-overlay">
+            <div class="premium-lock-card">
+              <span class="material-symbols-rounded" style="font-size: 32px; color: var(--seed-fg-brand); margin-bottom: 12px; display: block;">lock</span>
+              <h3 class="t-h2" style="font-size: 18px; margin-bottom: 8px;">개인 감정 분석 리포트</h3>
+              <p class="t-body" style="font-size: 13px; line-height: 1.4; color: var(--seed-fg-neutral-muted); margin-bottom: 16px;">
+                한 달간의 감정 기상도, 요일별 기분 흐름, 그리고 당신만을 위한 맞춤형 조언 편지를 잠금해제 하세요!
+              </p>
+              <ul class="premium-lock-features">
+                <li><span class="material-symbols-rounded">check_circle</span>상세 감정 기상도 제공</li>
+                <li><span class="material-symbols-rounded">check_circle</span>이모지별 기록 비율 통계</li>
+                <li><span class="material-symbols-rounded">check_circle</span>요일별 기분 흐름 인사이트</li>
+                <li><span class="material-symbols-rounded">check_circle</span>맞춤 마음 조언 (AI 케어 레터)</li>
+              </ul>
+              <button class="btn btn-brand-solid btn-medium" onclick="openPaymentModal()" style="margin-top: 16px;">
+                리포트 활성화 (9,900원)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Unlocked View (If paid) -->
+        <div id="premiumUnlockedView" class="premium-dashboard" style="display: none;">
+          <!-- 감정 날씨 -->
+          <div class="premium-card">
+            <div class="premium-card-title">
+              <span class="material-symbols-rounded">nest_eco_leaf</span>
+              나의 감정 기상도
+            </div>
+            <div class="weather-display">
+              <div class="weather-icon-box" id="premiumWeatherIconBox">
+                <span class="material-symbols-rounded" id="premiumWeatherIcon" style="font-size: 36px; color: var(--seed-fg-brand);">wb_sunny</span>
+              </div>
+              <div class="weather-info">
+                <div class="weather-status" id="premiumWeatherStatus">맑음</div>
+                <div class="weather-desc" id="premiumWeatherDesc">최근 긍정적인 감정 상태를 유지하고 계십니다!</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 이모지 통계 -->
+          <div class="premium-card">
+            <div class="premium-card-title">
+              <span class="material-symbols-rounded">analytics</span>
+              감정 이모지별 비율 통계
+            </div>
+            <div class="emotion-stats-grid" id="premiumEmojiStats">
+              <!-- Will be rendered by JS -->
+            </div>
+          </div>
+
+          <!-- 요일별 분석 -->
+          <div class="premium-card">
+            <div class="premium-card-title">
+              <span class="material-symbols-rounded">calendar_view_week</span>
+              요일별 감정 지수
+            </div>
+            <p class="t-body" style="font-size: 13px; margin-bottom: 16px;" id="premiumDowInsight">
+              어느 요일에 가장 에너지가 넘치고 기분이 좋은지 확인해 보세요!
+            </p>
+            <div class="dow-chart-container" id="premiumDowChart">
+              <!-- Will be rendered by JS -->
+            </div>
+          </div>
+
+          <!-- AI 조언 케어 레터 -->
+          <div class="premium-card" style="background: linear-gradient(135deg, rgba(255, 142, 207, 0.05) 0%, rgba(255, 240, 246, 0.3) 100%); border-color: rgba(255, 142, 207, 0.2);">
+            <div class="premium-card-title" style="color: var(--seed-fg-brand);">
+              <span class="material-symbols-rounded">forum</span>
+              ReflectAI 마음 건강 조언
+            </div>
+            <p class="t-body" style="font-size: 14px; line-height: 1.6; color: var(--seed-fg-neutral); font-weight: 500;" id="premiumAdviceText">
+              최근 감정 데이터를 분석하고 있습니다. 분석할 수 있는 기록이 최소 1개 이상 필요합니다.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -618,6 +1272,7 @@ document.addEventListener("DOMContentLoaded", function() {
     startTutorial();
   }
   updateStreak();
+  loadUser();
 });
 
 /* 질문 풀 */
@@ -813,6 +1468,446 @@ function analyze() {
       }
     }
   });
+}
+
+/* --- Google Login & Profile Logic --- */
+let googleUser = null;
+let googleClientId = localStorage.getItem("reflectai_google_client_id") || "";
+let isPaid = localStorage.getItem("reflectai_is_paid") === "true";
+
+function openProfileModal() {
+  const modal = document.getElementById("profileModal");
+  modal.classList.add("active");
+  document.getElementById("clientIdInput").value = googleClientId;
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.remove("active");
+}
+
+function loadUser() {
+  const savedUser = localStorage.getItem("reflectai_user");
+  if (savedUser) {
+    googleUser = JSON.parse(savedUser);
+  }
+  updateUserUI();
+  
+  // GIS API 로드 시도
+  if (googleClientId) {
+    setTimeout(initGoogleSignIn, 500);
+  }
+}
+
+function updateUserUI() {
+  const profileArea = document.getElementById("userProfileArea");
+  if (!profileArea) return;
+  
+  if (googleUser) {
+    profileArea.innerHTML = `
+      <img src="${googleUser.picture || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y'}" 
+           class="profile-img" 
+           onclick="openProfileModal()" 
+           alt="프로필">
+    `;
+    document.getElementById("modalLoggedOutState").style.display = "none";
+    document.getElementById("modalLoggedInState").style.display = "block";
+    
+    document.getElementById("modalProfileImg").src = googleUser.picture || 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
+    document.getElementById("modalProfileName").innerText = googleUser.name;
+    document.getElementById("modalProfileEmail").innerText = googleUser.email;
+  } else {
+    profileArea.innerHTML = `
+      <div class="profile-placeholder" onclick="openProfileModal()">
+        <span class="material-symbols-rounded" style="font-size: 20px;">account_circle</span>
+      </div>
+    `;
+    document.getElementById("modalLoggedOutState").style.display = "block";
+    document.getElementById("modalLoggedInState").style.display = "none";
+  }
+  
+  updatePaymentUI();
+}
+
+function updatePaymentUI() {
+  const isPaidStorage = localStorage.getItem("reflectai_is_paid") === "true";
+  isPaid = isPaidStorage;
+  
+  const paymentStatusBox = document.getElementById("paymentStatusBox");
+  const paymentStatusText = document.getElementById("paymentStatusText");
+  const badgeIcon = document.getElementById("paymentBadgeIcon");
+  
+  if (paymentStatusBox && paymentStatusText) {
+    if (isPaid) {
+      paymentStatusText.innerText = "프리미엄 회원 (평생 소장권)";
+      paymentStatusBox.style.background = "rgba(255, 142, 207, 0.12)";
+      paymentStatusBox.style.color = "var(--seed-fg-brand)";
+      if (badgeIcon) {
+        badgeIcon.innerText = "verified";
+        badgeIcon.style.color = "var(--seed-fg-brand)";
+      }
+    } else {
+      paymentStatusText.innerText = "기본 회원 (일반 감정 리포트)";
+      paymentStatusBox.style.background = "var(--seed-bg-neutral-weak)";
+      paymentStatusBox.style.color = "var(--seed-fg-neutral-muted)";
+      if (badgeIcon) {
+        badgeIcon.innerText = "lock_open";
+        badgeIcon.style.color = "var(--seed-fg-neutral-muted)";
+      }
+    }
+  }
+}
+
+function saveClientId() {
+  const val = document.getElementById("clientIdInput").value.trim();
+  googleClientId = val;
+  localStorage.setItem("reflectai_google_client_id", val);
+  alert("Client ID가 저장되었습니다. 페이지를 새로고침하여 적용합니다.");
+  location.reload();
+}
+
+function tryRealGoogleLogin() {
+  if (!googleClientId) {
+    alert("실제 Google 로그인을 하려면 아래에 Google Client ID를 먼저 입력하고 저장해 주세요. 우선 시뮬레이터를 사용해 테스트할 수 있습니다.");
+    return;
+  }
+  
+  if (typeof google === 'undefined') {
+    alert("Google API SDK가 아직 로드되지 않았거나 로드에 실패했습니다. 네트워크를 확인해 주세요.");
+    return;
+  }
+  
+  initGoogleSignIn();
+  try {
+    google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+        console.log("One tap skipped/not displayed. Please check configuration.");
+      }
+    });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function initGoogleSignIn() {
+  if (typeof google === 'undefined' || !googleClientId) return;
+  try {
+    google.accounts.id.initialize({
+      client_id: googleClientId,
+      callback: handleCredentialResponse
+    });
+    const btnWrapper = document.getElementById("googleBtnWrapper");
+    btnWrapper.innerHTML = ""; // Clear SVG placeholder
+    google.accounts.id.renderButton(
+      btnWrapper,
+      { theme: "outline", size: "large", width: 280 }
+    );
+  } catch (err) {
+    console.error("Google Sign-In initialization failed:", err);
+  }
+}
+
+function handleCredentialResponse(response) {
+  try {
+    const responsePayload = decodeJwtResponse(response.credential);
+    googleUser = {
+      name: responsePayload.name,
+      email: responsePayload.email,
+      picture: responsePayload.picture
+    };
+    localStorage.setItem("reflectai_user", JSON.stringify(googleUser));
+    updateUserUI();
+    closeModal('profileModal');
+    alert(`반갑습니다, ${googleUser.name}님! 구글 로그인에 성공했습니다.`);
+  } catch (e) {
+    console.error("Error handling credential response:", e);
+  }
+}
+
+function decodeJwtResponse(token) {
+  let base64Url = token.split('.')[1];
+  let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  let jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+  return JSON.parse(jsonPayload);
+}
+
+function showGoogleSimulator() {
+  closeModal('profileModal');
+  document.getElementById("googleSimulatorModal").classList.add("active");
+}
+
+function submitGoogleSimulator() {
+  const name = document.getElementById("simNameInput").value.trim() || "홍채빈";
+  const email = document.getElementById("simEmailInput").value.trim() || "chaevin@gmail.com";
+  
+  googleUser = {
+    name: name,
+    email: email,
+    picture: "" // Default avatar will be used
+  };
+  
+  localStorage.setItem("reflectai_user", JSON.stringify(googleUser));
+  updateUserUI();
+  closeModal('googleSimulatorModal');
+  alert(`[시뮬레이터] ${googleUser.name}님으로 로그인되었습니다.`);
+}
+
+function handleLogout() {
+  if (confirm("로그아웃 하시겠습니까?")) {
+    googleUser = null;
+    localStorage.removeItem("reflectai_user");
+    updateUserUI();
+    closeModal('profileModal');
+    alert("로그아웃 되었습니다.");
+  }
+}
+
+function resetAllStates() {
+  if (confirm("모든 감정 기록과 로그인 및 결제 정보가 초기화됩니다. 계속하시겠습니까?")) {
+    localStorage.clear();
+    alert("초기화 완료되었습니다. 페이지를 새로고침합니다.");
+    location.reload();
+  }
+}
+
+
+/* --- Payment Simulation Logic --- */
+let selectedMethod = "card";
+
+function openPaymentModal() {
+  document.getElementById("paymentSelectArea").style.display = "block";
+  document.getElementById("paymentLoadingArea").style.display = "none";
+  document.getElementById("paymentSuccessArea").style.display = "none";
+  
+  document.getElementById("paymentModal").classList.add("active");
+}
+
+function selectPaymentMethod(method, el) {
+  selectedMethod = method;
+  document.querySelectorAll(".payment-method-btn").forEach(btn => btn.classList.remove("selected"));
+  el.classList.add("selected");
+}
+
+function processPayment() {
+  document.getElementById("paymentSelectArea").style.display = "none";
+  document.getElementById("paymentLoadingArea").style.display = "flex";
+  
+  const statusEl = document.getElementById("paymentLoadingStatus");
+  
+  const steps = [
+    { text: "안전한 결제 세션을 연결하고 있습니다...", delay: 800 },
+    { text: "선택하신 결제 수단 승인 요청 중...", delay: 1600 },
+    { text: "전자금융결제 승인 완료 처리 중...", delay: 2400 }
+  ];
+  
+  steps.forEach(step => {
+    setTimeout(() => {
+      statusEl.innerText = step.text;
+    }, step.delay);
+  });
+  
+  setTimeout(() => {
+    localStorage.setItem("reflectai_is_paid", "true");
+    isPaid = true;
+    updatePaymentUI();
+    
+    document.getElementById("paymentLoadingArea").style.display = "none";
+    document.getElementById("paymentSuccessArea").style.display = "block";
+  }, 3200);
+}
+
+function finishPaymentFlow() {
+  closeModal('paymentModal');
+  switchAnalysisTab('premium');
+}
+
+
+/* --- Analysis Screen Tabs & Rendering --- */
+let activeTab = "basic";
+
+function switchAnalysisTab(tabName) {
+  activeTab = tabName;
+  
+  const btnBasic = document.getElementById("tabBtnBasic");
+  const btnPremium = document.getElementById("tabBtnPremium");
+  const contentBasic = document.getElementById("analysisBasicContent");
+  const contentPremium = document.getElementById("analysisPremiumContent");
+  
+  if (tabName === "basic") {
+    btnBasic.classList.add("active");
+    btnPremium.classList.remove("active");
+    contentBasic.style.display = "block";
+    contentPremium.style.display = "none";
+    analyze();
+  } else {
+    btnBasic.classList.remove("active");
+    btnPremium.classList.add("active");
+    contentBasic.style.display = "none";
+    contentPremium.style.display = "block";
+    renderPremiumReport();
+  }
+}
+
+function renderPremiumReport() {
+  const lockedView = document.getElementById("premiumLockedView");
+  const unlockedView = document.getElementById("premiumUnlockedView");
+  
+  const isPaidStorage = localStorage.getItem("reflectai_is_paid") === "true";
+  
+  if (!isPaidStorage) {
+    lockedView.style.display = "block";
+    unlockedView.style.display = "none";
+    return;
+  }
+  
+  lockedView.style.display = "none";
+  unlockedView.style.display = "flex";
+  
+  const rec = JSON.parse(localStorage.getItem("records")) || [];
+  
+  // 1. Weather Rendering
+  const weatherIcon = document.getElementById("premiumWeatherIcon");
+  const weatherStatus = document.getElementById("premiumWeatherStatus");
+  const weatherDesc = document.getElementById("premiumWeatherDesc");
+  
+  if (rec.length === 0) {
+    weatherStatus.innerText = "분석 불가";
+    weatherDesc.innerText = "기록이 아직 없습니다. 오늘의 기록 쓰기에서 감정을 기록해 주세요.";
+    weatherIcon.innerText = "question_mark";
+    document.getElementById("premiumEmojiStats").innerHTML = "<p class='t-body' style='grid-column: span 3; text-align:center; font-size:14px; margin: 10px 0;'>데이터가 없습니다.</p>";
+    document.getElementById("premiumDowChart").innerHTML = "<p class='t-body' style='text-align:center; font-size:14px; margin: 10px 0;'>데이터가 없습니다.</p>";
+    document.getElementById("premiumAdviceText").innerText = "감정 기록이 쌓이면 특별한 AI 조언 메시지를 제공해 드립니다.";
+    return;
+  }
+  
+  let totalScore = 0;
+  rec.forEach(r => totalScore += r.score);
+  const avgScore = totalScore / rec.length;
+  
+  if (avgScore >= 1.5) {
+    weatherStatus.innerText = "쾌청 (맑음) ☀️";
+    weatherDesc.innerText = "최근 마음의 에너지가 아주 풍성하고 긍정적입니다. 하고 싶었던 일에 도전하거나 주변 사람들에게 기쁨을 나누기에 완벽한 타이밍이에요!";
+    weatherIcon.innerText = "wb_sunny";
+  } else if (avgScore >= 0.2) {
+    weatherStatus.innerText = "대체로 평온함 ⛅";
+    weatherDesc.innerText = "안정적이고 건강한 마음 날씨입니다. 큰 굴곡 없이 잔잔한 행복을 느끼고 계시네요. 이 고요한 상태를 음미하며 푹 쉬어 보세요.";
+    weatherIcon.innerText = "filter_drama";
+  } else if (avgScore >= -1.0) {
+    weatherStatus.innerText = "다소 흐림 ☁️";
+    weatherDesc.innerText = "피로감이 쌓이거나 감정이 가라앉고 있습니다. 무리하게 기운을 내기보다, 오늘은 따뜻한 샤워를 하거나 좋아하는 노래를 들으며 쉬어가세요.";
+    weatherIcon.innerText = "cloud";
+  } else {
+    weatherStatus.innerText = "비 또는 천둥 🌧️";
+    weatherDesc.innerText = "마음속에 힘든 비바람이 불고 있는 시기입니다. 자책하지 마세요. 비가 온 뒤 땅이 굳어지듯, 지금은 나 자신에게 가장 너그러워져야 할 때입니다.";
+    weatherIcon.innerText = "umbrella";
+  }
+  
+  // 2. Emoji Stats
+  const emojiCounts = { "😍": 0, "😊": 0, "😐": 0, "😴": 0, "😢": 0, "😡": 0 };
+  rec.forEach(r => {
+    let score = r.score;
+    if (score === 2) emojiCounts["😍"]++;
+    else if (score === 1) emojiCounts["😊"]++;
+    else if (score === 0) emojiCounts["😐"]++;
+    else if (score === -1) emojiCounts["😴"]++;
+    else if (score === -2) emojiCounts["😢"]++;
+    else if (score <= -3) emojiCounts["😡"]++;
+  });
+  
+  let statsHtml = "";
+  const emotionsList = [
+    { emoji: "😍", label: "행복함" },
+    { emoji: "😊", label: "만족함" },
+    { emoji: "😐", label: "보통" },
+    { emoji: "😴", label: "피곤함" },
+    { emoji: "😢", label: "슬픔" },
+    { emoji: "😡", label: "화남" }
+  ];
+  
+  emotionsList.forEach(item => {
+    let count = emojiCounts[item.emoji] || 0;
+    let pct = rec.length > 0 ? Math.round((count / rec.length) * 100) : 0;
+    statsHtml += `
+      <div class="emotion-stat-item">
+        <div class="emotion-stat-emoji">${item.emoji}</div>
+        <div class="emotion-stat-pct">${pct}%</div>
+        <div class="emotion-stat-label">${item.label} (${count}회)</div>
+      </div>
+    `;
+  });
+  document.getElementById("premiumEmojiStats").innerHTML = statsHtml;
+  
+  // 3. Day of Week Analysis
+  const dowScores = [0, 0, 0, 0, 0, 0, 0];
+  const dowCounts = [0, 0, 0, 0, 0, 0, 0];
+  const dowNames = ["일", "월", "화", "수", "목", "금", "토"];
+  
+  rec.forEach(r => {
+    const d = new Date(r.date);
+    const dayIndex = d.getDay();
+    dowScores[dayIndex] += (r.score + 3); // Map -3..3 to 0..6 for positive height rendering
+    dowCounts[dayIndex]++;
+  });
+  
+  let bestDayIdx = -1, worstDayIdx = -1;
+  let maxAvg = -1, minAvg = 999;
+  
+  let dowChartHtml = "";
+  for (let i = 0; i < 7; i++) {
+    let count = dowCounts[i];
+    let avg = count > 0 ? (dowScores[i] / count) : 3; // 3 is mid point (0 in original scale)
+    let widthPct = Math.round((avg / 6) * 100);
+    
+    if (count > 0) {
+      if (avg > maxAvg) { maxAvg = avg; bestDayIdx = i; }
+      if (avg < minAvg) { minAvg = avg; worstDayIdx = i; }
+    }
+    
+    let displayScore = count > 0 ? (avg - 3).toFixed(1) : "-";
+    
+    dowChartHtml += `
+      <div class="dow-row">
+        <div class="dow-label">${dowNames[i]}</div>
+        <div class="dow-bar-bg">
+          <div class="dow-bar-fill" style="width: ${widthPct}%;"></div>
+        </div>
+        <div class="dow-value">${displayScore}</div>
+      </div>
+    `;
+  }
+  document.getElementById("premiumDowChart").innerHTML = dowChartHtml;
+  
+  let insightText = "아직 요일별 감정 편차를 분석하기에 데이터가 충분하지 않습니다. 지속적으로 일기를 기록해 주세요!";
+  if (bestDayIdx !== -1 && worstDayIdx !== -1 && bestDayIdx !== worstDayIdx) {
+    insightText = `당신은 주로 <strong style="color:var(--seed-fg-brand);">${dowNames[bestDayIdx]}요일</strong>에 가장 감정 지수가 높고 활기차며, <strong style="color:var(--seed-fg-neutral-muted);">${dowNames[worstDayIdx]}요일</strong>에 피로감이나 감정 조절이 더 필요한 편입니다.`;
+  } else if (bestDayIdx !== -1) {
+    insightText = `기록에 따르면 대체로 요일별 고른 기분 흐름을 보이고 계십니다.`;
+  }
+  document.getElementById("premiumDowInsight").innerHTML = insightText;
+  
+  // 4. Personalized Advice Letter
+  let advice = "";
+  if (avgScore >= 1.5) {
+    advice = `행복 에너지가 가득 찬 소중한 시기를 보내고 계시네요, ${googleUser ? googleUser.name : '회원'}님! 
+    요즘 같은 시기에는 사소한 도전도 기쁨이 될 수 있습니다. 오늘 저녁에는 평소 가보고 싶었던 새로운 카페에 들러보거나, 소중한 사람에게 "오늘도 화이팅!" 같은 짧은 안부 문자를 건네보는 것은 어떨까요? 
+    당신의 맑은 날씨를 온전히 누리고 기억할 수 있도록 일기장에 구체적인 행복의 요소를 3가지만 적어 보시길 강력히 추천합니다. 🌸`;
+  } else if (avgScore >= 0.2) {
+    advice = `잔잔하고 따뜻한 일상을 유지하고 계시네요. 큰 걱정이나 불안 없이 마음의 균형을 잘 지켜내고 계신 상태입니다. 
+    이 평화로움을 더 길게 가져가기 위해, 오늘 하루 10분 정도 조용히 명상을 하거나 깊은 호흡을 나누는 시간을 가져보세요. 
+    자연스러운 기쁨을 위해 가벼운 스트레칭이나 나만을 위한 작은 디저트 선물을 하는 것도 좋습니다. 지금처럼 나를 아끼고 지켜나가 주세요! 😊`;
+  } else if (avgScore >= -1.0) {
+    advice = `조금씩 흐린 구름이 밀려오며 피로감이 느껴지시는 상태군요. 일과 삶의 균형이 흔들리거나, 에너지가 소진되고 있을 수 있습니다. 
+    오늘은 일을 조금 일찍 마무리하고 온전한 휴식을 선사해 주는 것이 필요합니다. 
+    좋아하는 이불 속에서 푹 쉬거나 따뜻한 차 한 잔을 마시며 휴대폰을 멀리해 보세요. 
+    스스로에게 "오늘 하루도 고생 많았어, 힘들면 조금 쉬어도 괜찮아"라고 다독여 주시는 밤이 되기를 바랄게요. ☁️`;
+  } else {
+    advice = `마음에 제법 큰 비가 쏟아져 내리고 있군요, ${googleUser ? googleUser.name : '회원'}님. 
+    지금 겪고 있는 우울감이나 힘든 감정은 지극히 자연스러운 신호입니다. 자신을 다그치지 마세요. 
+    이럴 때는 혼자서 끙끙 앓기보다는, 감정을 일기장에 솔직하게 털어놓거나 아주 친한 친구나 가족에게 전화를 걸어 가볍게 수다를 떠는 것만으로도 마음의 짐이 가벼워질 수 있습니다. 
+    당장 해결하려 하지 말고, 오늘만큼은 좋아하는 영화를 보며 푹 자는 등 오직 본인의 편안함에만 집중해 주세요. ReflectAI가 항상 당신을 응원합니다. 🌧️`;
+  }
+  document.getElementById("premiumAdviceText").innerText = advice;
 }
 </script>
 </body>
